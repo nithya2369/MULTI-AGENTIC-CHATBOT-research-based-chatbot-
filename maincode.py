@@ -5,32 +5,25 @@ from bs4 import BeautifulSoup
 import spacy
 import markdown
 import os
-# Initialize the Groq client
+
 groq_client = Groq(
     api_key="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",
 )
-# Load spaCy model that includes word vectors
-nlp = spacy.load("en_core_web_md")  # Use a model that includes word vectors (en_core_web_md or en_core_web_lg)
-# Define the model
+
+nlp = spacy.load("en_core_web_md")  
 llama_70B = "llama-3.1-70b-versatile"
 
-# Streamlit app configuration
 st.set_page_config(page_title="Research Chatbot", layout="wide")
 
-# Title and introduction
 st.title("Conversational Research Chatbot")
 st.write("Chat with an AI")
 
-# Initialize session state for conversation history
 if "conversation_history" not in st.session_state:
     st.session_state.conversation_history = [
         {"role": "system", "content": 
         "You are an AI chatbot specializing in various research fields and marketing analysis. Kindly provide a comprehensive and accurate response to the query."}
     ]
 
-# Helper functions
-
-# Agent 1: Research company or industry
 def research_company(company_name):
     try:
         url = f"https://en.wikipedia.org/wiki/{company_name.replace(' ', '_')}"
@@ -41,9 +34,8 @@ def research_company(company_name):
     except Exception as e:
         return f"Error occurred: {str(e)}"
 
-# Agent 2: Generate use cases
 def generate_use_cases(company_name, industry_name):
-    # Example use cases based on company and industry
+
     return f"""
     As an AI agent, you are equipped to provide in-depth insights and solutions for various industry-specific challenges. 
     Your expertise includes predictive analytics for demand forecasting in the {industry_name} sector,
@@ -53,23 +45,20 @@ def generate_use_cases(company_name, industry_name):
      With your ability to analyze complex data, identify opportunities, and recommend innovative strategies, you are a valuable resource for organizations seeking to stay competitive and drive growth in their industries.
 """
 
-# Agent 3: Resource asset collection and GenAI solutions
 def collect_resources_and_propose_solutions(use_cases):
     try:
-        # Fetch datasets from platforms
+
         resources = {
             "Kaggle": f"https://www.kaggle.com/search?q={use_cases.replace(' ', '+')}",
             "HuggingFace": f"https://huggingface.co/models?search={use_cases.replace(' ', '+')}",
             "GitHub": f"https://github.com/search?q={use_cases.replace(' ', '+')}",
         }
 
-        # Save links to a markdown file
         file_path = "resources.md"
         with open(file_path, "w") as file:
             for platform, link in resources.items():
                 file.write(f"- [{platform}]({link})\n")
 
-        # GenAI solutions
         genai_solutions = """
     As an AI agent, you are designed to provide advanced, context-aware solutions for organizational needs. 
     Your expertise includes AI-driven web search, enabling efficient retrieval of internal documents by understanding context and relevance, reducing time spent on manual searches. 
@@ -81,7 +70,6 @@ def collect_resources_and_propose_solutions(use_cases):
     except Exception as e:
         return f"Error occurred while collecting resources: {str(e)}", None
 
-# Helper function to determine the agent
 def determine_agent(user_input):
     if "research" in user_input.lower():
         return "agent_1"
@@ -91,7 +79,6 @@ def determine_agent(user_input):
         return "agent_3"
     return None
 
-# User input
 user_input = st.text_input("You:", placeholder="Type your message here...")
 
 if user_input:
@@ -164,7 +151,6 @@ if user_input:
                 {"role": "assistant", "content": assistant_response}
             )
 
-# Display conversation history
 for message in st.session_state.conversation_history:
     if message["role"] == "user":
         st.markdown(f"**You:** {message['content']}")
